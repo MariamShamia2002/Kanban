@@ -43,7 +43,11 @@ export async function apiClient<T>(
           ? body.error
           : { code: synthesisedCode, message: response.statusText || synthesisedCode },
     };
-
+    if (response.status===401 && token){
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("auth_user");
+      window.location.replace("/login");
+    }
     throw apiError;
   }
 
@@ -52,10 +56,6 @@ export async function apiClient<T>(
     return undefined as T;
   }
 
-  if (response.status===401){
-    window.location.href = "/login";
-    
-  }
   // ── Success 
   const body = await response.json();
   return body.data as T;

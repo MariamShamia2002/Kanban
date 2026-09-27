@@ -13,8 +13,7 @@ export default function BoardsListPage() {
   const createStarter = useCreateStarterBoard();
 
   const boardCount = boards?.length ?? 0;
-  const cardTotal =
-    boards?.reduce((sum, board) => sum + board.counts.cards, 0) ?? 0;
+  const cardTotal =boards?.reduce((sum, board) => sum + board.counts.cards, 0) ?? 0;
 
   return (
     <div className="mx-auto w-full max-w-5xl">
@@ -61,8 +60,7 @@ export default function BoardsListPage() {
 
       {!isPending && !isError && boardCount === 0 && (
         <BoardsEmptyState
-          onCreateStarter={() => {
-            void createStarter.mutateAsync("Untitled board");
+          onCreateStarter={() => {void createStarter.mutateAsync("Untitled board");
           }}
           isCreatingStarter={createStarter.isPending}
         />
