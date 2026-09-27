@@ -1,18 +1,8 @@
-import { AuthProvider } from "./features/auth/context/AuthProvider"
-// import LoginPage from "./features/auth/pages/LoginPage";
-import { router } from "./router"
-import { RouterProvider } from "react-router"
+import { RouterProvider } from "react-router";
+import { router } from "./router";
 
 function App() {
-
-
-  return (
-		
-		<AuthProvider>
-      <RouterProvider router={router} />
-		</AuthProvider>
-		
-	);
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
