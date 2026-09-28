@@ -3,6 +3,7 @@ import { BoardCard } from "@/features/board/components/BoardCard";
 import { BoardsEmptyState } from "@/features/board/components/BoardsEmptyState";
 import { BoardsListSkeleton } from "@/features/board/components/BoardsListSkeleton";
 import { CreateBoardPopover } from "@/features/board/components/CreateBoardPopover";
+import { NewBoardTile } from "@/features/board/components/NewBoardTile";
 import { useBoards } from "@/features/board/hooks/useBoards";
 import { useCreateStarterBoard } from "@/features/board/hooks/useCreateStarterBoard";
 import { getErrorMessage } from "@/api/errors";
@@ -72,14 +73,7 @@ export default function BoardsListPage() {
             <BoardCard key={board.id} board={board} />
           ))}
 
-          <CreateBoardPopover align="center">
-            <button
-              type="button"
-              className="flex min-h-[120px] w-full items-center justify-center rounded-xl border border-dashed border-border bg-transparent text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-            >
-              + New board
-            </button>
-          </CreateBoardPopover>
+          <NewBoardTile />
         </div>
       )}
     </div>
