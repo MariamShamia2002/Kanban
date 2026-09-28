@@ -7,6 +7,7 @@ import { getFieldErrors, getErrorMessage, isApiError } from "@/api/errors";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { DeleteBoardDialog } from "@/features/board/components/DeleteBoardDialog";
 import { useDuplicateBoard } from "@/features/board/hooks/useDuplicateBoard";
 import { useUpdateBoard } from "@/features/board/hooks/useUpdateBoard";
@@ -14,6 +15,7 @@ import { columnBarSegments } from "@/features/board/lib/columnBarSegments";
 import { formatRelativeTime } from "@/features/board/lib/formatRelativeTime";
 import { boardNameSchema, type BoardNameFormValues } from "@/features/board/schemas/boardNameSchema";
 import type { BoardSummary } from "@/features/board/types/board.types";
+import { cn } from "@/lib/utils";
 
 interface BoardCardProps {
 	board: BoardSummary;
@@ -98,16 +100,18 @@ export function BoardCard({ board }: BoardCardProps) {
 				onKeyDown={(e) => {
 					if (isRenaming) return;
 					if (e.key === "Enter" || e.key === " ") {e.preventDefault(); openBoard();}}}
-				className="group flex cursor-pointer flex-col gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/25 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+				aria-busy={duplicateBoard.isPending}
+				className="group relative flex cursor-pointer flex-col gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/25 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
 				<div className="flex items-start justify-between gap-2">
 					{isRenaming ? (
-						<div className="min-w-0 flex-1" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+						<div className="relative min-w-0 flex-1" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
 							<Input
 								{...nameField}
 								readOnly={isSubmitting}
+								aria-busy={isSubmitting}
 								aria-invalid={!!renameError}
 								aria-describedby={renameError ? `rename-error-${board.id}` : undefined}
-								className={renameError ? "h-8 border-destructive focus-visible:ring-destructive/40" : "h-8"}
+								className={cn("h-8", isSubmitting && "pr-8 text-muted-foreground", renameError && "border-destructive focus-visible:ring-destructive/40")}
 								onBlur={(e) => {
 									void nameField.onBlur(e);
 									submitRename();
@@ -123,6 +127,7 @@ export function BoardCard({ board }: BoardCardProps) {
 									}
 								}}
 							/>
+							{isSubmitting && <Spinner aria-label="Saving name" className="absolute top-2 right-2.5 text-muted-foreground" />}
 							{renameError && (
 								<p id={`rename-error-${board.id}`} role="alert" className="mt-1 text-xs text-destructive">
 									{renameError}
@@ -140,11 +145,7 @@ export function BoardCard({ board }: BoardCardProps) {
 						<DropdownMenuContent align="end" className="min-w-40" onClick={(e) => e.stopPropagation()}>
 							<DropdownMenuItem onClick={openBoard}>Open board</DropdownMenuItem>
 							<DropdownMenuItem onClick={startRename}>Rename</DropdownMenuItem>
-							<DropdownMenuItem
-								disabled={duplicateBoard.isPending}
-								onClick={() => {
-									void duplicateBoard.mutateAsync(board.id);
-								}}>
+							<DropdownMenuItem disabled={duplicateBoard.isPending} onClick={() => duplicateBoard.mutate(board.id)}>
 								Duplicate
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
@@ -178,6 +179,19 @@ export function BoardCard({ board }: BoardCardProps) {
 						{formatRelativeTime(board.updatedAt)}
 					</time>
 				</div>
+
+				{duplicateBoard.isError && (
+					<p role="alert" className="text-xs text-destructive">
+						{getErrorMessage(duplicateBoard.error, "Couldn't duplicate board. Please try again.")}
+					</p>
+				)}
+
+				{duplicateBoard.isPending && (
+					<div className="absolute inset-0 flex items-center justify-center gap-2 rounded-xl bg-card/80 text-sm font-medium text-muted-foreground backdrop-blur-[1px]" onClick={(e) => e.stopPropagation()}>
+						<Spinner aria-hidden />
+						Duplicating…
+					</div>
+				)}
 			</article>
 
 			<DeleteBoardDialog open={deleteOpen} onOpenChange={setDeleteOpen} boardId={board.id} boardName={board.name} />
