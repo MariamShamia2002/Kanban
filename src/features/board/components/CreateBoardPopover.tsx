@@ -1,9 +1,9 @@
 import { useEffect, useState, type ReactElement } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { getFieldErrors, getErrorMessage, isApiError } from "@/api/errors";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
@@ -83,7 +83,7 @@ export function CreateBoardPopover({ children, align = "end" }: CreateBoardPopov
 					<Button type="submit" disabled={busy} className="w-full">
 						{busy ? (
 							<>
-								<Loader2 className="animate-spin" />
+								<Spinner />
 								Creating…
 							</>
 						) : (

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { CreateBoardPopover } from "@/features/board/components/CreateBoardPopover";
-import { Loader2 } from "lucide-react";
 
 interface BoardsEmptyStateProps {
   onCreateStarter: () => void;
@@ -39,7 +39,7 @@ export function BoardsEmptyState({
         >
           {isCreatingStarter ? (
             <>
-              <Loader2 className="animate-spin" />
+              <Spinner />
               Creating…
             </>
           ) : (
