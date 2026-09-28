@@ -1,4 +1,7 @@
-import { createBoard, createCard, createColumn, createLabel, getBoard } from "@/features/board/api/boardsApi";
+import { createBoard, getBoard } from "@/features/board/api/boardsApi";
+import { createCard } from "@/features/card/api/cardsApi";
+import { createColumn } from "@/features/column/api/columnsApi";
+import { createLabel } from "@/features/label/api/labelsApi";
 import type { Board, BoardSummary } from "@/features/board/types/board.types";
 export async function duplicateBoardById(token: string, boardId: string): Promise<BoardSummary> {
 	const source = await getBoard(token, boardId);

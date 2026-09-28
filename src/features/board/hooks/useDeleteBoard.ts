@@ -9,8 +9,7 @@ export function useDeleteBoard() {
 
   return useMutation({
     mutationFn: (boardId: string) => deleteBoard(token!, boardId),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: boardKeys.lists() });
-    },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: boardKeys.lists() }),
   });
 }

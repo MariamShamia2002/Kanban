@@ -1,9 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createBoard, createColumn } from "@/features/board/api/boardsApi";
+import { createBoard } from "@/features/board/api/boardsApi";
 import { boardKeys } from "@/features/board/hooks/boardKeys";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-
-const STARTER_COLUMNS = ["To Do", "Doing", "Done"] as const;
+import { createStarterColumns } from "@/features/column/lib/starterColumns";
 
 /** Creates a board with To Do / Doing / Done columns. */
 export function useCreateStarterBoard() {
@@ -13,9 +12,7 @@ export function useCreateStarterBoard() {
   return useMutation({
     mutationFn: async (name: string) => {
       const board = await createBoard(token!, { name });
-      for (const columnName of STARTER_COLUMNS) {
-        await createColumn(token!, board.id, { name: columnName });
-      }
+      await createStarterColumns(token!, board.id);
       return board;
     },
     onSuccess: () => {

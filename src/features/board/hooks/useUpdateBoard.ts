@@ -10,8 +10,10 @@ export function useUpdateBoard() {
   return useMutation({
     mutationFn: ({ boardId, name }: { boardId: string; name: string }) =>
       updateBoard(token!, boardId, { name }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: boardKeys.lists() });
-    },
+    onSuccess: (_board, { boardId }) =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: boardKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: boardKeys.detail(boardId) }),
+      ]),
   });
 }

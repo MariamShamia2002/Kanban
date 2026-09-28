@@ -10,8 +10,7 @@ export function useDuplicateBoard() {
 
   return useMutation({
     mutationFn: (boardId: string) => duplicateBoardById(token!, boardId),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: boardKeys.lists() });
-    },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: boardKeys.lists() }),
   });
 }

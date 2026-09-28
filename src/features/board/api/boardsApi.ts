@@ -1,5 +1,5 @@
 import { apiClient } from "@/api/client";
-import type { Board, BoardSummary, Card, Column, CreateBoardBody, CreateCardBody, CreateColumnBody, CreateLabelBody, Label, UpdateBoardBody } from "@/features/board/types/board.types";
+import type { Board, BoardSummary, CreateBoardBody, UpdateBoardBody } from "@/features/board/types/board.types";
 
 export function getBoards(token: string) {
 	return apiClient<BoardSummary[]>("/api/boards", { token });
@@ -29,29 +29,5 @@ export function deleteBoard(token: string, boardId: string) {
 	return apiClient<void>(`/api/boards/${boardId}`, {
 		method: "DELETE",
 		token,
-	});
-}
-
-export function createColumn(token: string, boardId: string, body: CreateColumnBody) {
-	return apiClient<Column>(`/api/boards/${boardId}/columns`, {
-		method: "POST",
-		token,
-		body: JSON.stringify(body),
-	});
-}
-
-export function createLabel(token: string, boardId: string, body: CreateLabelBody) {
-	return apiClient<Label>(`/api/boards/${boardId}/labels`, {
-		method: "POST",
-		token,
-		body: JSON.stringify(body),
-	});
-}
-
-export function createCard(token: string, columnId: string, body: CreateCardBody) {
-	return apiClient<Card>(`/api/columns/${columnId}/cards`, {
-		method: "POST",
-		token,
-		body: JSON.stringify(body),
 	});
 }
