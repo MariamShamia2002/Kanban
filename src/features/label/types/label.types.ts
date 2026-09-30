@@ -7,7 +7,10 @@ export interface Label {
   updatedAt?: string;
 }
 
+/** `color` must be a hex string such as `#F59E0B`; names are unique per board. */
 export interface CreateLabelBody {
   name: string;
   color: string;
 }
+
+export type UpdateLabelBody = Partial<CreateLabelBody>;
