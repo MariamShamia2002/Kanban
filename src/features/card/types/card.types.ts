@@ -19,3 +19,11 @@ export interface CreateCardBody {
   position?: number;
   labelIds?: string[];
 }
+
+
+// Omit a key to leave it untouched; null clears description/ dueDate.
+// labelIds is a full replace — [] clears every label.
+ 
+export type UpdateCardBody = Partial<CreateCardBody> & {
+  columnId?: string;
+};
