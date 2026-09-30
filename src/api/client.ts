@@ -1,4 +1,4 @@
-import type { ApiError, ApiErrorCode,ApiErrorBody } from "./types";
+import type { ApiError, ApiErrorBody, ApiErrorCode } from "./types";
 
 export const API_URL = import.meta.env.VITE_API_URL as string;
 
@@ -8,17 +8,33 @@ if (!API_URL) {
 
 interface RequestOptions extends RequestInit {
   token?: string;
+  /** Return the full `{ data, meta }` envelope instead of only `data`. */
+  withMeta?: boolean;
 }
 
-export async function apiClient<T>(
+export interface ApiResponse<T, M = unknown> {
+  data: T;
+  meta?: M;
+}
+
+export function apiClient<T, M = unknown>(
+  endpoint: string,
+  options: RequestOptions & { withMeta: true },
+): Promise<ApiResponse<T, M>>;
+export function apiClient<T>(
+  endpoint: string,
+  options?: RequestOptions & { withMeta?: false },
+): Promise<T>;
+export async function apiClient<T, M = unknown>(
   endpoint: string,
   options: RequestOptions = {},
-): Promise<T> {
-  const { token, headers, ...fetchOptions } = options;
+): Promise<T | ApiResponse<T, M>> {
+  const { token, headers, withMeta = false, ...fetchOptions } = options;
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...fetchOptions,
-    headers: {"Content-Type": "application/json" ,
+    headers: {
+      "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
@@ -31,19 +47,18 @@ export async function apiClient<T>(
     try {
       body = await response.json();
     } catch {
-      // Body is not JSON 
+      // Body is not JSON
     }
 
     const synthesisedCode = statusToCode(response.status);
 
     const apiError: ApiError = {
       status: response.status,
-      error:
-        isErrorEnvelope(body)
-          ? body.error
-          : { code: synthesisedCode, message: response.statusText || synthesisedCode },
+      error: isErrorEnvelope(body)
+        ? body.error
+        : { code: synthesisedCode, message: response.statusText || synthesisedCode },
     };
-    if (response.status===401 && token){
+    if (response.status === 401 && token) {
       localStorage.removeItem("auth_token");
       localStorage.removeItem("auth_user");
       window.location.replace("/login");
@@ -51,20 +66,15 @@ export async function apiClient<T>(
     throw apiError;
   }
 
-  // ── 204 No Content 
-  if (response.status === 204) {
-    return undefined as T;
-  }
+  // ── Success (204 No Content has no body)
+  const envelope: ApiResponse<T, M> =
+    response.status === 204 ? { data: undefined as T } : await response.json();
 
-  // ── Success 
-  const body = await response.json();
-  return body.data as T;
+  return withMeta ? envelope : envelope.data;
 }
 
 /** Checks that an unknown value has the { error: { code, message } } shape. */
-export function isErrorEnvelope(
-  v: unknown,
-): v is {error: ApiErrorBody }{
+export function isErrorEnvelope(v: unknown): v is { error: ApiErrorBody } {
   return (
     typeof v === "object" &&
     v !== null &&
