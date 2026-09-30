@@ -17,3 +17,6 @@ export interface CreateColumnBody {
   name: string;
   position?: number;
 }
+
+/** Rename (`name`), move (`position`), or both. */
+export type UpdateColumnBody = Partial<CreateColumnBody>;
